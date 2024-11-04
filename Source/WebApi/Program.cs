@@ -1,12 +1,14 @@
-using System.Reflection;
-// using NSwag;
+// https://dombarter.co.uk/posts/add-dotnet-jwts-to-web-api/
+// https://github.com/domaindrivendev/Swashbuckle.AspNetCore#add-security-definitions-and-requirements-for-bearer-auth
+
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// builder.Services.AddOpenApiDocument();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => 
@@ -22,47 +24,44 @@ builder.Services.AddSwaggerGen(options =>
         // LicenseName = "", 
     });
 
-    // using System.Reflection;
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    // Documentation 
+    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+    // Security 
+    var jwtSecurityScheme = new OpenApiSecurityScheme 
+    {
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        // In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        Description = "Put **_ONLY_** your JWT Bearer token in ...",
+
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    options.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+
 });
 
-// builder.Services.AddOpenApiDocument(options => {
-//      options.PostProcess = document =>
-//      {
-//          document.Info = new OpenApiInfo
-//          {
-//              // Version = "v3",
-//              Title = "ToDo API",
-//              Description = "An ASP.NET Core Web API for managing ToDo items",
-//              TermsOfService = "https://example.com/terms",
-//              Contact = new OpenApiContact
-//              {
-//                  Name = "Example Contact",
-//                  Url = "https://example.com/contact"
-//              },
-//              License = new OpenApiLicense
-//              {
-//                  Name = "Example License",
-//                  Url = "https://example.com/license"
-//              }
-//          };
-//      };
-// });
+builder.Services.AddTransient<IClaimService, ClaimService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // app.UseOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    // app.UseReDoc(options => 
-    // {
-    //     options.Path = "/redoc";
-    // });
 }
 
 app.UseHttpsRedirection();

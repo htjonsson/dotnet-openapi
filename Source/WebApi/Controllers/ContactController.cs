@@ -6,6 +6,7 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/contact/")]
+[ClaimRequirement]
 public class ContactController : ControllerBase
 {
     private readonly ILogger<ContactController> _logger;
@@ -20,6 +21,7 @@ public class ContactController : ControllerBase
     /// </summary>
     [HttpGet]
     [Produces("application/json")]
+    [EndpointName("GetContact")]
     public IActionResult GetContact()
     {
         return Ok();
@@ -31,6 +33,7 @@ public class ContactController : ControllerBase
     [HttpGet]
     [Route("{id}")]
     [Produces("application/json")]
+    [EndpointName("GetContactById")]
     public IActionResult GetContactById([FromRoute] string id)
     {
         return Ok();
