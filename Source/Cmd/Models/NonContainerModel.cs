@@ -2,8 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cmd.Models;
 
-[Container]
-public class ContactModel
+public class NonContainerModel
 {
     [Required]
     [MaxLength(10)]

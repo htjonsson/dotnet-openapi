@@ -7,6 +7,7 @@ namespace WebApi.Controllers;
 [ApiController]
 [Route("api/v1/contact/")]
 [ClaimRequirement]
+[Area("Contact-V1")]
 public class ContactController : ControllerBase
 {
     private readonly ILogger<ContactController> _logger;
@@ -59,7 +60,10 @@ public class ContactController : ControllerBase
     /// <response code="403">Im a Teapot</response>
     [HttpPost]
     [Consumes("application/json")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType<string>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(int), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ContactRequest>(StatusCodes.Status418ImATeapot)]
